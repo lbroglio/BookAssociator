@@ -100,7 +100,7 @@ public class WeightedList<T> implements Collection<T> {
         contents = new ArrayList<ListEntry>(startSize);
     }
     /**
-     * Swaps the data at the two given indexs within the given array
+     * Swaps the data at the two given indexes within the given array
      *
      * @param arr The array to operate in
      * @param i1 The index of the first piece of data in the given array
@@ -347,6 +347,15 @@ public class WeightedList<T> implements Collection<T> {
         return contents.get(i).data;
     }
 
-
+    /**
+     * Returns the weight of the entry at the given index
+     *
+     * @param i The index to get the weight for
+     *
+     * @return The weight of the entry at index i
+     */
+    public int getWeight(int i){
+        return contents.get(i).weight;
+    }
 
 }
