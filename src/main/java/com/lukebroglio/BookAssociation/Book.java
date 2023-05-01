@@ -21,5 +21,9 @@ public class Book {
      * The data this book was published
      */
     private Date publicationDate;
+    /**
+     * Stores the tags assigned to this book in order by an assigned weight using a {@link WeightedList}
+     */
+    public WeightedList<String> tags;
 
 }
