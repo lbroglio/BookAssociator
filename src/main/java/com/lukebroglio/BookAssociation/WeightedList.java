@@ -1,6 +1,7 @@
 package com.lukebroglio.BookAssociation;
 
-import java.sql.Array;
+import org.springframework.lang.NonNull;
+
 import java.util.*;
 
 
@@ -48,8 +49,14 @@ public class WeightedList<T> implements Collection<T> {
 
         @Override
         public boolean equals(Object o){
-            return data.equals(o);
+            if(o != null){
+                return data.equals(o);
+            }
+            else{
+                return false;
+            }
         }
+
         @Override
         public int hashCode() {
             return data.hashCode();
@@ -177,10 +184,11 @@ public class WeightedList<T> implements Collection<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean contains(Object o){
       ListEntry checkEntry = new ListEntry((T)o);
 
-      return contents.contains(o);
+      return contents.contains(checkEntry);
     }
 
     @Override
@@ -200,7 +208,8 @@ public class WeightedList<T> implements Collection<T> {
     }
 
     @Override
-    public <E> E[] toArray(E[] a) {
+    @SuppressWarnings("unchecked")
+    public <E> E[] toArray(@NonNull E[] a) {
         for(int i = 0; i < contents.size(); i++){
             a[i] =  (E) contents.get(i).data;
         }
@@ -211,14 +220,13 @@ public class WeightedList<T> implements Collection<T> {
     /**
      * Increases the weight of the given item by one
      *
-     *
      * @param t The item to increment the weight of
      *
      * @return true if the operation was successful; false if it fails (Fails are caused by the item not being in the list)
      */
     public boolean incrementItemWeight(T t){
-        if(contents.contains(t)){
-            contents.get(contents.indexOf(t)).weight += 1;
+        if(contents.contains(new ListEntry(t))){
+            contents.get(contents.indexOf(new ListEntry(t))).weight += 1;
             return true;
         }
         return false;
@@ -227,7 +235,6 @@ public class WeightedList<T> implements Collection<T> {
     /**
      * Adds the given element t with a weight of 0 if it isn't already in the list. If it is already in the list
      * increments its weight by one.
-     *
      * Sorts the contents of the List to maintain its order by weight after adding.
      *
      * @param t The element to add into the list
@@ -240,7 +247,7 @@ public class WeightedList<T> implements Collection<T> {
 
         boolean flag;
 
-       if(contents.contains(t)){
+       if(contents.contains(new ListEntry(t))){
            incrementItemWeight(t);
            flag = false;
        }
@@ -258,7 +265,6 @@ public class WeightedList<T> implements Collection<T> {
     /**
      * Adds the given element t with the given weight if it isn't already in the list. If it is already in the list
      * increments its weight by one.
-     *
      * Sorts the contents of the List to maintain its order by weight after adding.
      *
      * @param t The element to add into the list
@@ -270,7 +276,7 @@ public class WeightedList<T> implements Collection<T> {
         ListEntry toAdd = new ListEntry(t,weight);
         boolean flag;
 
-        if(contents.contains(t)){
+        if(contents.contains(new ListEntry(t))){
             incrementItemWeight(t);
             flag = false;
         }
@@ -286,7 +292,7 @@ public class WeightedList<T> implements Collection<T> {
     private boolean addNoSort(T t,int weight){
         ListEntry toAdd = new ListEntry(t,weight);
 
-        if(contents.contains(t)){
+        if(contents.contains(new ListEntry(t))){
             incrementItemWeight(t);
             return false;
         }
@@ -300,7 +306,7 @@ public class WeightedList<T> implements Collection<T> {
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(@NonNull Collection<?> c) {
         return contents.containsAll(c);
     }
 
@@ -322,12 +328,12 @@ public class WeightedList<T> implements Collection<T> {
     }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
+    public boolean removeAll(@NonNull Collection<?> c) {
         return contents.removeAll(c);
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(@NonNull Collection<?> c) {
         return contents.retainAll(c);
     }
 
@@ -356,6 +362,17 @@ public class WeightedList<T> implements Collection<T> {
      */
     public int getWeight(int i){
         return contents.get(i).weight;
+    }
+
+    /**
+     * Gets the index of the given element in the backing array
+     *
+     * @param element The element to get the index of
+     *
+     * @return The index of the item in the backing array
+     */
+    public int indexOf(T element){
+        return contents.indexOf(new ListEntry(element));
     }
 
 }

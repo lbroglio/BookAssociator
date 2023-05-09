@@ -95,7 +95,7 @@ public class Author {
      * @return The authors first, middle if needed, and last name concatenated.
      */
     public String getFullName() {
-        if (middleName.equals("") != true) {
+        if (!middleName.equals("")) {
             return firstName + " " + middleName + " " + lastName;
         } else {
             return firstName + " " + lastName;
