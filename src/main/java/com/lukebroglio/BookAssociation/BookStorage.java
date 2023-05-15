@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class BookStorage {
      * @throws FileNotFoundException Throws if the given filePath is invalid
      * @throws ParseException        Thrown by the JSONParser
      */
-    //This is necessary for interacting the JSON files.
+    //This is necessary for interacting with the JSON files.
     @SuppressWarnings("unchecked")
     public void readInBooks(String filePath) throws FileNotFoundException, ParseException {
         //Loads the entire JSON file into a string
@@ -45,11 +46,17 @@ public class BookStorage {
 
         //Parse the read JSON
         JSONParser parser = new JSONParser(booksJson);
-        ArrayList<Object> booksArr = parser.parseArray();
+        ArrayList<Object> parsedArr = parser.parseArray();
+
+        //Get the books array from the parsed JSON
+        ArrayList<Object> booksArr = (ArrayList<Object>) parsedArr.get(0);
+
+        //Parse the Map holding the weight of the tags
+        HashMap<String,HashMap<String, BigInteger>> tagWeight = (HashMap<String, HashMap<String, BigInteger>>) parsedArr.get(1);
 
         //Load the books into the storage map associated with their titles
         for (Object o : booksArr) {
-            Book tmp = new Book((LinkedHashMap<Object, Object>) o);
+            Book tmp = new Book((LinkedHashMap<Object, Object>) o,tagWeight);
             bookMap.put(tmp.getTitle(),tmp);
         }
     }
@@ -60,15 +67,37 @@ public class BookStorage {
      * @throws IOException Thrown if the file could be opened
      */
     public void saveBooks(String saveFile) throws IOException {
+        //Holds the JSON Object Books
         JSONArray bookJson = new JSONArray();
+        //Standard Array of all the books in this object
         Book[] bookArray = bookMap.values().toArray(new Book[0]);
+        //Associates each books with a Map storing the weight of its tags
+        HashMap<String,HashMap<String,Integer>> tagWeights = new HashMap<>();
 
+        //For every book
         for(int i=0; i < bookMap.size(); i++){
+            //Add the Book to its array
             bookJson.put(new JSONObject(bookArray[i]));
-        }
+            //Put an entry to store its tags weight
+            tagWeights.put(bookArray[i].getTitle(),new HashMap<>());
 
+            //For every tag
+            WeightedList<String> currTags = bookArray[i].getTags();
+
+            for(int j =0; j <currTags.size(); j++){
+                //Associate the tag with its weight
+                tagWeights.get(bookArray[i].getTitle()).put(currTags.get(j),currTags.getWeight(j));
+            }
+        }
+        //Add the Book array and Tag Map to a JSON array
+        JSONArray combinedJSON = new JSONArray();
+        combinedJSON.put(bookJson);
+        combinedJSON.put(new JSONObject(tagWeights));
+
+        //Write the JSON to a file
         FileWriter outputFile = new FileWriter(saveFile);
-        outputFile.write(bookJson.toString());
+        outputFile.write(combinedJSON.toString());
+
         outputFile.close();
     }
 
@@ -96,6 +125,20 @@ public class BookStorage {
         }
 
         return relatedBooks;
+    }
+
+    /**
+     * Gets a Book with the given title from the map
+     *
+     * @param title String storing the title of the book to get
+     * @return The {@link Book} object of the requested Book
+     */
+    public Book getBook(String title){
+        return bookMap.get(title);
+    }
+
+    public Book[] getAllBooks(){
+        return bookMap.values().toArray(new Book[0]);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.lukebroglio.BookAssociation;
 
 
+import java.math.BigInteger;
 import java.util.*;
 import java.time.LocalDate;
 
@@ -74,7 +75,7 @@ public class Book {
      */
     //This is necessary because this constructor is used when creating Books from a read in JSON which leads to unavoidable casts
     @SuppressWarnings("unchecked")
-    Book(LinkedHashMap<Object,Object> o){
+    Book(LinkedHashMap<Object,Object> o,HashMap<String, HashMap<String,BigInteger>> t){
         this.title = (String) o.get("title");
         this.publisher = (String) o.get("publisher");;
         this.publicationDate = LocalDate.parse((String) o.get("publicationDate"));
@@ -90,6 +91,12 @@ public class Book {
 
         ArrayList<String> tagList = (ArrayList<String>) o.get("tags");
         this.tags.addAll(tagList);
+
+        HashMap<String, BigInteger> tagWeights = t.get(this.title);
+        for(int i =0; i < this.tags.size(); i++){
+            String tag = tags.get(i);
+            this.tags.setWeight(tag, tagWeights.get(tag).intValue());
+        }
 
     }
 

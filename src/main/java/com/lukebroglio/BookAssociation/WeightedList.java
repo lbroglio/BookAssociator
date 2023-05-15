@@ -16,7 +16,7 @@ public class WeightedList<T> implements Collection<T> {
     /**
      * Class to hold an entry in this list with its weight
      */
-    private class ListEntry {
+    public class ListEntry {
         /**
          * The data stored in this entry
          */
@@ -49,11 +49,11 @@ public class WeightedList<T> implements Collection<T> {
 
         @Override
         public boolean equals(Object o){
-            if(o != null){
-                return data.equals(o);
+            if(o.getClass().equals(ListEntry.class)){
+                return data.equals(((ListEntry) o).data);
             }
-            else{
-                return false;
+            else {
+                return data.equals(o);
             }
         }
 
@@ -72,10 +72,10 @@ public class WeightedList<T> implements Collection<T> {
         /**
          * Stores the location of this iterator within the {@link WeightedList}
          */
-        private int location = 0;
+        private int location = -1;
         @Override
         public boolean hasNext() {
-            return (location+1 < contents.size());
+            return (location + 1 < contents.size());
         }
 
         @Override
@@ -99,7 +99,7 @@ public class WeightedList<T> implements Collection<T> {
     }
 
     /**
-     * Constucts a new WeightedList with the given inital size
+     * Constructs a new WeightedList with the given initial size
      *
      * @param startSize The size to initialize the backing {@link ArrayList} with
      */
@@ -373,6 +373,25 @@ public class WeightedList<T> implements Collection<T> {
      */
     public int indexOf(T element){
         return contents.indexOf(new ListEntry(element));
+    }
+
+    /**
+     * Sets the weight of the ListEntry with the given data to the given weight
+     *
+     * @param data The data to set the weight of
+     * @param newWeight The new weight to assign to the given data
+     *
+     * @return True if the change in weight was successful false if it wasn't (EX/ The given data isn't in the list)
+     */
+    public boolean setWeight(T data, Integer newWeight) {
+        int indexToSet = this.indexOf(data);
+
+        if(indexToSet != -1){
+            contents.get(indexToSet).weight = newWeight;
+            return true;
+        }
+        return false;
+
     }
 
 }
