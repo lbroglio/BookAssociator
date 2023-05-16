@@ -10,8 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -121,7 +119,11 @@ public class BookStorage {
         WeightedList<Book> relatedBooks = new WeightedList<>();
 
         for (int i = 0; i < bookMap.size(); i++) {
-            relatedBooks.addWithWeight(allBooks[i], startingPoint.getSimilarityRanking(allBooks[i]));
+            int similarityRank = startingPoint.getSimilarityRanking(allBooks[i]);
+            if(similarityRank != 0 && !allBooks[i].equals(startingPoint)){
+                relatedBooks.addWithWeight(allBooks[i], similarityRank);
+            }
+
         }
 
         return relatedBooks;

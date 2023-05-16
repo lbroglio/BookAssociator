@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BookAssociationFrontEnd</title>
+</head>
+<script>
+    let fieldList = ["First-Name","Middle-Name","Last-Name","Title","Suffix"];
+    let objectFieldList = ["firstName","middleName","lastName","title","suffix"];
+
+    function addAuthorInput(){
+        let currentInputs = document.getElementsByClassName("authorStorage");
+        let aNum = currentInputs.length + 1;
+
+        let newDiv = document.createElement("div");
+        newDiv.classList.add("authorStorage");
+
+        let newLabel = document.createElement("label");
+        newLabel.innerHTML = "Author " + aNum + ": ";
+        newLabel.classList.add("aMainLabel");
+        newDiv.appendChild(newLabel);
+
+        for(let i=0; i < fieldList.length; i++){
+            newLabel = document.createElement("label");
+            newLabel.for = "a" + aNum + fieldList[i];
+            newLabel.innerHTML = " " + fieldList[i].replace('-',' ') + ": ";
+            newDiv.appendChild(newLabel);
+
+            newInput = document.createElement("input");
+            newInput.type = "text";
+            newInput.id = "a" + aNum + fieldList[i];
+            newDiv.appendChild(newInput);
+        }
+        let currentChildren = document.getElementById("authorsInput").childNodes;
+        document.getElementById("authorsInput").insertBefore(newDiv, currentChildren[currentChildren.length - 2]);
+
+
+
+    }
+
+    function getAll(){
+       fetch("http://localhost:8080/")
+          .then((response) => response.json())
+          .then((data) => {
+                console.log(data);
+                let allBookDisplay = document.getElementById('allBooks');
+                allBookDisplay.innerHTML = JSON.stringify(data);
+          });
+    }
+    function getRelated(evt){
+       evt.preventDefault();
+       let title = document.getElementById('relatedInput').value;
+       console.log(title);
+       fetch("http://localhost:8080/related/"+title)
+          .then((response) => response.json())
+          .then((data) => {
+                console.log(data);
+                let relatedDisplay = document.getElementById('relatedBooks');
+                relatedDisplay.innerHTML = JSON.stringify(data);
+          });
+    }
+
+    function handleBookAdd(evt) {
+        evt.preventDefault();
+        let submission = {}
+        submission["title"] = document.getElementById("titleAdd").value;
+        submission["publisher"] = document.getElementById("publisherAdd").value;
+        submission["publicationDate"] = document.getElementById("dateAdd").value;
+        console.log(submission["publicationDate"]);
+        submission["authors"] = [];
+        submission["tags"] = [];
+
+        let numAuthors = document.getElementsByClassName("authorStorage").length;
+
+        for(let i=0; i < numAuthors; i++){
+            let newAuthor = {};
+            for(let j =0; j < objectFieldList.length; j++){
+                newAuthor[objectFieldList[j]] = document.getElementById("a"+(i + 1)+fieldList[j]).value;
+            }
+            submission["authors"].push(newAuthor);
+        }
+
+        console.log(submission);
+        fetch("http://localhost:8080/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(submission),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Post a new product completed");
+          if (data) {
+            //const keys = Object.keys(data);
+            const value = Object.values(data);
+            alert(value);
+          }
+        });
+    }
+
+   addEventListener("DOMContentLoaded", (event) => {
+    var form = document.getElementById("relatedForm");
+    form.addEventListener('submit', getRelated);
+
+    form = document.getElementById("addForm");
+    form.addEventListener('submit', handleBookAdd);
+
+    });
+
+
+</script>
+<style>
+    #addForm>input{
+    margin-top: 10px;
+   }
+   #authorsInput input{
+    margin-top: 10px;
+   }
+
+   .aMainLabel{
+    font-weight: bold;
+   }
+</style>
+
+<body>
+<p id ='allBooks'></p> <button onclick="getAll()">Get Books</button>
+<hr>
+<p id="relatedBooks"></p>
+<form id="relatedForm">
+    <input id ="relatedInput" type="text">
+    <button type="submit">Submit</button>
+
+</form>
+
+<hr>
+<form id="addForm">
+    <label for="titleAdd">Title: </label>
+    <input type="text" id="titleAdd">
+
+
+    <div id="authorsInput" style="border-style: solid; margin-top: 10px; border-width: thin">
+        <div class="authorStorage">
+            <label class="aMainLabel">Author 1:</label>
+
+            <label for="a1First-Name">First Name: </label>
+            <input type="text" id="a1First-Name">
+
+            <label for="a1Middle-Name">Middle Name: </label>
+            <input type="text" id="a1Middle-Name">
+
+            <label for="a1Last-Name">Last Name: </label>
+            <input type="text" id="a1Last-Name">
+
+            <label for="a1Title">Title: </label>
+            <input type="text" id="a1Title">
+
+            <label for="a1Suffix">Suffix: </label>
+            <input type="text" id="a1Suffix">
+
+        </div>
+        <button type="button" onclick="addAuthorInput()">+</button>
+
+    </div>
+
+
+    <label for="publisherAdd">Publisher: </label>
+    <input type="text" id="publisherAdd">
+
+
+    <label for="dateAdd">Publication Date: </label>
+    <input type="date" id="dateAdd">
+
+    <button type="submit">Add Book</button>
+
+</form>
+
+</body>
+</html>
