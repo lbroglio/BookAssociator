@@ -243,7 +243,7 @@ public class WeightedList<T> implements Collection<T> {
      */
     @Override
     public boolean add(T t) {
-       ListEntry toAdd = new ListEntry(t,0);
+       ListEntry toAdd = new ListEntry(t,1);
 
         boolean flag;
 

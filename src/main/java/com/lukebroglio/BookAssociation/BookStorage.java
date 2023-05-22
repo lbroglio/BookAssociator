@@ -143,4 +143,8 @@ public class BookStorage {
         return bookMap.values().toArray(new Book[0]);
     }
 
+    public void tagBook(String title, String tag){
+        bookMap.get(title).addTag(tag);
+    }
+
 }

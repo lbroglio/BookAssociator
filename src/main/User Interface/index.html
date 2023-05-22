@@ -97,12 +97,39 @@
         });
     }
 
+    function handleTag(evt){
+        evt.preventDefault();
+
+        let submission = {}
+        submission["title"] = document.getElementById("tagTitle").value;
+        submission["tag"] = document.getElementById("tagToAdd").value;
+        console.log(submission)
+        fetch("http://localhost:8080/tag", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(submission),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Tag successfully added");
+          if (data) {
+            //const keys = Object.keys(data);
+            const value = Object.values(data);
+            alert(value);
+          }
+        });
+
+    }
+
    addEventListener("DOMContentLoaded", (event) => {
     var form = document.getElementById("relatedForm");
     form.addEventListener('submit', getRelated);
 
     form = document.getElementById("addForm");
     form.addEventListener('submit', handleBookAdd);
+
+    form = document.getElementById("tagForm");
+    form.addEventListener('submit', handleTag);
 
     });
 
@@ -127,7 +154,7 @@
 <p id="relatedBooks"></p>
 <form id="relatedForm">
     <input id ="relatedInput" type="text">
-    <button type="submit">Submit</button>
+    <button type="submit">Get Book</button>
 
 </form>
 
@@ -172,6 +199,17 @@
     <button type="submit">Add Book</button>
 
 </form>
+<hr>
 
+<form id="tagForm">
+    <label for="tagTitle">Title: </label>
+    <input type="text" id="tagTitle">
+
+    <label for="tagToAdd">Tag: </label>
+    <input type="text" id="tagToAdd">
+
+    <button type="submit">Tag Book</button>
+
+</form>
 </body>
 </html>

@@ -54,5 +54,15 @@ public class BookAssociationApplication {
 		storedBooks.saveBooks("Test.json");
 	}
 
+	@PutMapping("/tag")
+	public void tagBook(@RequestBody String tagJSON) throws ParseException, IOException {
+		JSONParser parser = new JSONParser(tagJSON);
+		LinkedHashMap<Object,Object> parsedRequest = (LinkedHashMap<Object, Object>) parser.parse();
+
+		storedBooks.tagBook((String) parsedRequest.get("title"), (String) parsedRequest.get("tag"));
+
+		storedBooks.saveBooks("Test.json");
+	}
+
 
 }
